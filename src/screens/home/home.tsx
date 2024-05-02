@@ -7,31 +7,30 @@ import {
   Text,
   View,
 } from 'react-native';
-import {useTheme} from '../../assets/theme';
-import MarketList from '../../component/marketList';
-import AppBar from '../../component/appbar';
-import FiltersRow from '../../component/filterRow';
+import {useTheme} from '../../assets/config/theme';
+import MarketList from '../../component/marketList/marketList';
+import AppBar from '../../component/appBar/appbar';
 import {useHome} from './useHome';
 import {homeStyles} from './styles';
+import SearchScreen from '../../component/searchScreen/searchScreen';
+import {MARKET_LIST_DATA} from '../../data/data';
+import Filters from '../../component/filter/filters';
 const {width, height} = Dimensions.get('screen');
 
 type Props = {};
 
 const Home = (props: Props) => {
   const {
-    ThemeService,
     data,
     sortedData,
     page,
     isLoading,
-    // dataFetch,
     fetchData,
     filter,
     updater,
     setData,
     setFilter,
     setPage,
-    setSortedData,
     setLoading,
     filtering,
     navigation,
@@ -39,10 +38,23 @@ const Home = (props: Props) => {
     filterByName,
     filterByPrice,
     filterByChanges,
+    touch,
+    setTouch,
+    theme,
+    searchData,
+    setSearchData,
+    AtoZ,
+    pSort,
+    mvSort,
+    chSort,
+    setAtoZ,
+    setPSort,
+    setMvSort,
+    setChSort,
   } = useHome();
 
   React.useEffect(() => {
-    if (isLoading) {
+    if (isLoading && !touch) {
       setTimeout(() => {
         fetchData();
       }, 200);
@@ -50,62 +62,94 @@ const Home = (props: Props) => {
   }, [page]);
 
   React.useEffect(() => {
-    const interval = setInterval(() => {
-      updater();
-    }, 20000);
+    if (!touch) {
+      const interval = setInterval(() => {
+        updater();
+      }, 20000);
 
-    return () => {
-      clearInterval(interval);
-    };
+      return () => {
+        clearInterval(interval);
+      };
+    }
   }, [data]);
 
   React.useEffect(() => {
-    if (filter === 'M.V') {
-      filterByMarketValue(data);
-    } else if (filter === 'Name') {
-      filterByName(data);
-    } else if (filter === 'Price') {
-      filterByPrice(data);
-    } else {
-      filterByChanges(data);
+    if (!touch) {
+      if (filter === 'M.V') {
+        filterByMarketValue(data, mvSort);
+      } else if (filter === 'Name') {
+        filterByName(data, AtoZ);
+      } else if (filter === 'Price') {
+        filterByPrice(data, pSort);
+      } else if (filter === '24h Chg') {
+        filterByChanges(data, chSort);
+      }
     }
-  }, [data]);
+  }, [data, AtoZ, pSort]);
 
   return (
     <SafeAreaView
       style={[
         homeStyles.container,
         {
-          backgroundColor: useTheme(ThemeService()).systemColor.backgroundColor,
+          backgroundColor: useTheme(theme).systemColor.backgroundColor,
         },
       ]}>
       <StatusBar
-        barStyle={ThemeService() === 'dark' ? 'light-content' : 'dark-content'}
+        barStyle={theme === 'dark' ? 'light-content' : 'dark-content'}
       />
       <View style={homeStyles.listContainer}>
         <AppBar
           appBarProps={{
-            searchBox: true,
+            searchBox: {
+              data: MARKET_LIST_DATA.data,
+              setData: setSearchData,
+              touch: touch,
+              setTouch: setTouch,
+            },
             back: false,
+            profile: true,
           }}
+          theme={theme}
         />
-        <FiltersRow
-          theme={ThemeService()}
-          data={data}
-          filter={filter}
-          setData={setData}
-          setFilter={setFilter}
-          filtering={filtering}
-        />
-        <MarketList
-          theme={ThemeService()}
-          data={data}
-          setLoading={setLoading}
-          setPage={setPage}
-          page={page}
-          isLoading={isLoading}
-          navigation={navigation}
-        />
+        {touch ? (
+          <SearchScreen
+            theme={theme}
+            data={searchData}
+            navigation={navigation}
+          />
+        ) : (
+          <>
+            <Filters
+              theme={theme}
+              data={data}
+              filter={filter}
+              setFilter={setFilter}
+              filterByMarketValue={filterByMarketValue}
+              filterByPrice={filterByPrice}
+              filterByChanges={filterByChanges}
+              filterByName={filterByName}
+              AtoZ={AtoZ}
+              pSort={pSort}
+              mvSort={mvSort}
+              chSort={chSort}
+              setAtoZ={setAtoZ}
+              setPSort={setPSort}
+              setMvSort={setMvSort}
+              setChSort={setChSort}
+            />
+            <MarketList
+              theme={theme}
+              data={data}
+              setLoading={setLoading}
+              setPage={setPage}
+              page={page}
+              isLoading={isLoading}
+              navigation={navigation}
+              fetchData={fetchData}
+            />
+          </>
+        )}
       </View>
     </SafeAreaView>
   );

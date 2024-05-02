@@ -8,124 +8,121 @@ import {
   Text,
   View,
 } from 'react-native';
-import ThemeService from '../../services/themeService';
-import {useTheme} from '../../assets/theme';
-import AppBar from '../../component/appbar';
+import {useTheme} from '../../assets/config/theme';
+import AppBar from '../../component/appBar/appbar';
 import {RouteProp, useRoute} from '@react-navigation/native';
 import {routeStackParams} from '../../utils/types';
 import {CRYPTO_SIZES} from '../../utils/constant';
+import {useCoin} from './useCoin';
+import {coinStyles} from './style';
 const {width, height} = Dimensions.get('screen');
 
-type Props = {};
 type detailsOfCoinScreenType = RouteProp<routeStackParams, 'coin'>;
-const Coin = (props: Props) => {
+const Coin = () => {
   const route = useRoute<detailsOfCoinScreenType>();
   const {
     params: {coin},
   } = route;
 
-  const divided = (digit: number) => {
-    if (digit.toString().length < 7) {
-      return `${(digit / 1000).toFixed(2).toString()}K`;
-    } else if (digit.toString().length < 10) {
-      return `${(digit / 1000000).toFixed(2).toString()}M`;
-    } else {
-      return `${(digit / 1000000000).toFixed(2).toString()}B`;
-    }
-  };
+  const {theme, divided} = useCoin();
+
   return (
     <SafeAreaView
       style={[
-        styles.container,
-        {backgroundColor: useTheme(ThemeService()).systemColor.backgroundColor},
+        coinStyles.container,
+        {backgroundColor: useTheme(theme).systemColor.backgroundColor},
       ]}>
-      <View style={styles.divider}>
+      <View style={coinStyles.divider}>
         <AppBar
+          theme={theme}
           appBarProps={{
             searchBox: false,
-            back: true,
+            back: {
+              text: 'Details',
+            },
+            profile: false,
           }}
         />
-        <View style={styles.coinNameContainer}>
-          <View style={styles.iconContainer}>
-            <Image source={{uri: coin.logo}} style={styles.icon} />
+        <View style={coinStyles.coinNameContainer}>
+          <View style={coinStyles.iconContainer}>
+            <Image source={{uri: coin.logo}} style={coinStyles.icon} />
           </View>
-          <View style={styles.names}>
+          <View style={coinStyles.names}>
             <Text
               style={[
-                styles.completeCoinName,
-                {color: useTheme(ThemeService()).systemColor.text},
+                coinStyles.completeCoinName,
+                {color: useTheme(theme).systemColor.text},
               ]}>
               {coin.url_name.split('-')[0]}
             </Text>
             <Text
               style={[
-                styles.coinNameText,
-                {color: useTheme(ThemeService()).systemColor.nute},
+                coinStyles.coinNameText,
+                {color: useTheme(theme).systemColor.nute},
               ]}>
               {coin.name.en.split('/')[0]}
             </Text>
           </View>
         </View>
-        <View style={styles.LastPriceAndChanges}>
+        <View style={coinStyles.LastPriceAndChanges}>
           <Text
             style={[
-              styles.lastPriceText,
-              {color: useTheme(ThemeService()).systemColor.text},
+              coinStyles.lastPriceText,
+              {color: useTheme(theme).systemColor.text},
             ]}>
             {coin.financial?.last24h.close}
           </Text>
           <Text
             style={[
-              styles.unitText,
-              {color: useTheme(ThemeService()).systemColor.text},
+              coinStyles.unitText,
+              {color: useTheme(theme).systemColor.text},
             ]}>
             USD
           </Text>
           <View
             style={[
-              styles.changeBox,
-              {backgroundColor: useTheme(ThemeService()).systemColor.success},
+              coinStyles.changeBox,
+              {backgroundColor: useTheme(theme).systemColor.success},
             ]}>
             <Text
               style={[
-                styles.changesText,
-                {color: useTheme(ThemeService()).systemColor.text},
+                coinStyles.changesText,
+                {color: useTheme(theme).systemColor.text},
               ]}>
               {coin.financial?.last24h.change_percent}%
             </Text>
           </View>
         </View>
-        <View style={styles.detailsContainer}>
-          <View style={styles.half}>
-            <View style={styles.detailsBox}>
+        <View style={coinStyles.detailsContainer}>
+          <View style={coinStyles.half}>
+            <View style={coinStyles.detailsBox}>
               <Text
                 style={[
-                  styles.detailsTitleText,
-                  {color: useTheme(ThemeService()).systemColor.nute},
+                  coinStyles.detailsTitleText,
+                  {color: useTheme(theme).systemColor.nute},
                 ]}>
                 Market Price
               </Text>
               <Text
                 style={[
-                  styles.detailsPrice,
-                  {color: useTheme(ThemeService()).systemColor.text},
+                  coinStyles.detailsPrice,
+                  {color: useTheme(theme).systemColor.text},
                 ]}>
                 {coin.buy}
               </Text>
             </View>
-            <View style={styles.detailsBox}>
+            <View style={coinStyles.detailsBox}>
               <Text
                 style={[
-                  styles.detailsTitleText,
-                  {color: useTheme(ThemeService()).systemColor.nute},
+                  coinStyles.detailsTitleText,
+                  {color: useTheme(theme).systemColor.nute},
                 ]}>
                 Market Volume
               </Text>
               <Text
                 style={[
-                  styles.detailsPrice,
-                  {color: useTheme(ThemeService()).systemColor.text},
+                  coinStyles.detailsPrice,
+                  {color: useTheme(theme).systemColor.text},
                 ]}>
                 {divided(
                   coin.financial?.last24h.quote_volume !== undefined
@@ -134,97 +131,97 @@ const Coin = (props: Props) => {
                 )}
               </Text>
             </View>
-            <View style={styles.detailsBox}>
+            <View style={coinStyles.detailsBox}>
               <Text
                 style={[
-                  styles.detailsTitleText,
-                  {color: useTheme(ThemeService()).systemColor.nute},
+                  coinStyles.detailsTitleText,
+                  {color: useTheme(theme).systemColor.nute},
                 ]}>
                 Ordered
               </Text>
               <Text
                 style={[
-                  styles.detailsPrice,
-                  {color: useTheme(ThemeService()).systemColor.text},
+                  coinStyles.detailsPrice,
+                  {color: useTheme(theme).systemColor.text},
                 ]}>
                 {coin.show_order}
               </Text>
             </View>
           </View>
-          <View style={styles.half}>
-            <View style={styles.detailsBox}>
+          <View style={coinStyles.half}>
+            <View style={coinStyles.detailsBox}>
               <Text
                 style={[
-                  styles.detailsTitleText,
-                  {color: useTheme(ThemeService()).systemColor.nute},
+                  coinStyles.detailsTitleText,
+                  {color: useTheme(theme).systemColor.nute},
                 ]}>
                 24h Lowest
               </Text>
               <Text
                 style={[
-                  styles.detailsPrice,
-                  {color: useTheme(ThemeService()).systemColor.text},
+                  coinStyles.detailsPrice,
+                  {color: useTheme(theme).systemColor.text},
                 ]}>
                 {coin.financial?.last24h.lowest}
               </Text>
             </View>
-            <View style={styles.detailsBox}>
+            <View style={coinStyles.detailsBox}>
               <Text
                 style={[
-                  styles.detailsTitleText,
-                  {color: useTheme(ThemeService()).systemColor.nute},
+                  coinStyles.detailsTitleText,
+                  {color: useTheme(theme).systemColor.nute},
                 ]}>
                 24h highest
               </Text>
               <Text
                 style={[
-                  styles.detailsPrice,
-                  {color: useTheme(ThemeService()).systemColor.text},
+                  coinStyles.detailsPrice,
+                  {color: useTheme(theme).systemColor.text},
                 ]}>
                 {coin.financial?.last24h.highest}
               </Text>
             </View>
-            <View style={styles.detailsBox}>
+            <View style={coinStyles.detailsBox}>
               <Text
                 style={[
-                  styles.detailsTitleText,
-                  {color: useTheme(ThemeService()).systemColor.nute},
+                  coinStyles.detailsTitleText,
+                  {color: useTheme(theme).systemColor.nute},
                 ]}>
                 Open Price
               </Text>
               <Text
                 style={[
-                  styles.detailsPrice,
-                  {color: useTheme(ThemeService()).systemColor.text},
+                  coinStyles.detailsPrice,
+                  {color: useTheme(theme).systemColor.text},
                 ]}>
                 {coin.financial?.last24h.open}
               </Text>
             </View>
           </View>
         </View>
-        <View style={styles.buttonContainer}>
+        <View style={coinStyles.buttonContainer}>
           <Pressable
             style={[
-              styles.button,
-              {backgroundColor: useTheme(ThemeService()).systemColor.success},
+              coinStyles.button,
+              {backgroundColor: useTheme(theme).systemColor.success},
             ]}>
             <Text
               style={[
-                styles.buttonText,
-                {color: useTheme(ThemeService()).systemColor.text},
+                coinStyles.buttonText,
+                {color: useTheme(theme).systemColor.text},
               ]}>
               Buy
             </Text>
           </Pressable>
           <Pressable
             style={[
-              styles.button,
-              {backgroundColor: useTheme(ThemeService()).systemColor.error},
+              coinStyles.button,
+              {backgroundColor: useTheme(theme).systemColor.error},
             ]}>
             <Text
               style={[
-                styles.buttonText,
-                {color: useTheme(ThemeService()).systemColor.text},
+                coinStyles.buttonText,
+                {color: useTheme(theme).systemColor.text},
               ]}>
               Sell
             </Text>
@@ -236,128 +233,3 @@ const Coin = (props: Props) => {
 };
 
 export default Coin;
-
-const styles = StyleSheet.create({
-  container: {
-    width,
-    height,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  divider: {
-    width: '100%',
-    height: '100%',
-    alignItems: 'center',
-    paddingHorizontal: 16,
-  },
-  LastPriceAndChanges: {
-    width: '100%',
-    // height: '9.5%',
-    flexDirection: 'row',
-    alignItems: 'flex-end',
-    paddingHorizontal: 12,
-    marginTop: 20,
-  },
-  coinNameContainer: {
-    width: '100%',
-    height: '9.5%',
-    flexDirection: 'row',
-    alignItems: 'center',
-    marginTop: 10,
-  },
-  completeCoinName: {
-    fontSize: 30,
-    fontWeight: 'bold',
-  },
-  iconContainer: {
-    width: '15%',
-    height: '100%',
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  icon: {
-    width: CRYPTO_SIZES.icon.width,
-    height: CRYPTO_SIZES.icon.width,
-  },
-  names: {
-    height: '100%',
-    justifyContent: 'center',
-    alignItems: 'flex-start',
-  },
-  coinNameText: {
-    fontSize: 14,
-    fontWeight: 'normal',
-    marginVertical: 2,
-  },
-  lastPriceText: {
-    fontSize: 30,
-    fontWeight: 'bold',
-  },
-  unitText: {
-    fontSize: 17,
-    fontWeight: 'bold',
-    marginLeft: 8,
-    marginBottom: 4,
-  },
-  changeBox: {
-    width: width * 0.16,
-    height: width * 0.07,
-    marginBottom: 4,
-    marginLeft: 16,
-    borderRadius: 8,
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  changesText: {
-    fontSize: 13,
-    fontWeight: 'bold',
-  },
-  detailsContainer: {
-    width: '100%',
-    height: '30%',
-    flexDirection: 'row',
-    marginTop: 20,
-    paddingHorizontal: 14,
-  },
-  half: {
-    width: '50%',
-    height: '100%',
-    justifyContent: 'space-around',
-    alignItems: 'center',
-  },
-  detailsBox: {
-    width: '100%',
-    justifyContent: 'center',
-    alignItems: 'flex-start',
-  },
-  detailsTitleText: {
-    fontSize: 16,
-    fontWeight: 'normal',
-    marginBottom: 6,
-  },
-  detailsPrice: {
-    fontSize: 20,
-    fontWeight: 'bold',
-  },
-  buttonContainer: {
-    width: '100%',
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    paddingHorizontal: 10,
-    paddingVertical: 4,
-    marginTop: 30,
-  },
-  button: {
-    width: '46%',
-    height: width * 0.14,
-    justifyContent: 'center',
-    alignItems: 'center',
-    borderRadius: 8,
-    borderWidth: 1,
-  },
-  buttonText: {
-    fontSize: 22,
-    fontWeight: 'bold',
-  },
-});

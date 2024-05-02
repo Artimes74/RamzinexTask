@@ -7,21 +7,29 @@ import {
   routeStackParams,
   themeType,
 } from '../../utils/types';
-import ThemeService from '../../services/themeService';
+import ThemeService from '../../hook/themeService';
 import {StackNavigationProp} from '@react-navigation/stack';
 import {useNavigation} from '@react-navigation/native';
+import {useAppSelector} from '../../hook/reduxHook';
 
 type dataFetchProps = {
   multiTo: number;
 };
 
 export const useHome = () => {
-  ThemeService();
+  const appTheme = useAppSelector(state => state.reducers.userReducer.theme);
+  const theme: 'dark' | 'light' = ThemeService(appTheme);
   const [data, setData] = React.useState<marketDatatype[]>([]);
   const [sortedData, setSortedData] = React.useState<marketDatatype[]>([]);
+  const [searchData, setSearchData] = React.useState<marketDatatype[]>([]);
   const [page, setPage] = React.useState<number>(1);
+  const [touch, setTouch] = React.useState<boolean>(false);
   const [isLoading, setLoading] = React.useState<boolean>(true);
   const [filter, setFilter] = React.useState<filtersType>('M.V');
+  const [AtoZ, setAtoZ] = React.useState<'UP' | 'DOWN'>('DOWN');
+  const [pSort, setPSort] = React.useState<'UP' | 'DOWN'>('DOWN');
+  const [mvSort, setMvSort] = React.useState<'UP' | 'DOWN'>('DOWN');
+  const [chSort, setChSort] = React.useState<'UP' | 'DOWN'>('DOWN');
   type navigationType = StackNavigationProp<routeStackParams, 'home'>;
   const navigation = useNavigation<navigationType>();
 
@@ -160,19 +168,70 @@ export const useHome = () => {
     }
   };
 
-  const filterByMarketValue = (data: marketDatatype[]) => {
+  const filterByMarketValue = (
+    data: marketDatatype[],
+    filter: 'UP' | 'DOWN',
+  ) => {
     let sortedList: marketDatatype[] = [];
-    sortedList = data.sort(
-      (a, b) =>
-        //@ts-ignore
-        b.financial?.last24h.quote_volume - a.financial?.last24h.quote_volume,
-    );
-    setData(sortedList);
+    switch (filter) {
+      case 'UP':
+        sortedList = data.sort(
+          (a, b) =>
+            //@ts-ignore
+            b.financial?.last24h.quote_volume -
+            //@ts-ignore
+            a.financial?.last24h.quote_volume,
+        );
+        return setData(sortedList);
+      case 'DOWN':
+        sortedList = data.sort(
+          (a, b) =>
+            //@ts-ignore
+            a.financial?.last24h.quote_volume -
+            //@ts-ignore
+            b.financial?.last24h.quote_volume,
+        );
+        return setData(sortedList);
+      default:
+        return null;
+    }
   };
 
-  const filterByName = (data: marketDatatype[]) => {
+  const filterByName = (data: marketDatatype[], filter: 'UP' | 'DOWN') => {
     let sortedList: marketDatatype[] = [];
+    switch (filter) {
+      case 'UP':
+        sortedList = data.sort((x, y) => {
+          const lowercaseX = x.name.en.split('/')[0].toLowerCase();
+          const lowercaseY = y.name.en.split('/')[0].toLowerCase();
 
+          if (lowercaseX < lowercaseY) {
+            return -1;
+          } else if (lowercaseX > lowercaseY) {
+            return 1;
+          } else {
+            return 0;
+          }
+        });
+        return setData(sortedList);
+      case 'DOWN':
+        sortedList = data.sort((x, y) => {
+          const lowercaseX = x.name.en.split('/')[0].toLowerCase();
+          const lowercaseY = y.name.en.split('/')[0].toLowerCase();
+
+          if (lowercaseY < lowercaseX) {
+            return -1;
+          } else if (lowercaseY > lowercaseX) {
+            return 1;
+          } else {
+            return 0;
+          }
+        });
+        return setData(sortedList);
+
+      default:
+        return null;
+    }
     sortedList = data.sort((x, y) => {
       const lowercaseX = x.name.en.split('/')[0].toLowerCase();
       const lowercaseY = y.name.en.split('/')[0].toLowerCase();
@@ -188,24 +247,56 @@ export const useHome = () => {
     setData(sortedList);
   };
 
-  const filterByPrice = (data: marketDatatype[]) => {
+  const filterByPrice = (data: marketDatatype[], filter: 'UP' | 'DOWN') => {
     let sortedList: marketDatatype[] = [];
-    sortedList = data.sort(
-      (a, b) =>
-        //@ts-ignore
-        b.financial?.last24h.quote_volume - a.financial?.last24h.quote_volume,
-    );
-    setData(sortedList);
+    switch (filter) {
+      case 'UP':
+        sortedList = data.sort(
+          (a, b) =>
+            //@ts-ignore
+            b.financial?.last24h.quote_volume -
+            //@ts-ignore
+            a.financial?.last24h.quote_volume,
+        );
+        return setData(sortedList);
+      case 'DOWN':
+        sortedList = data.sort(
+          (a, b) =>
+            //@ts-ignore
+            a.financial?.last24h.quote_volume -
+            //@ts-ignore
+            b.financial?.last24h.quote_volume,
+        );
+        return setData(sortedList);
+      default:
+        return null;
+    }
   };
 
-  const filterByChanges = (data: marketDatatype[]) => {
+  const filterByChanges = (data: marketDatatype[], filter: 'UP' | 'DOWN') => {
     let sortedList: marketDatatype[] = [];
-    sortedList = data.sort(
-      (a, b) =>
-        //@ts-ignore
-        b.financial?.last24h.quote_volume - a.financial?.last24h.quote_volume,
-    );
-    setData(sortedList);
+    switch (filter) {
+      case 'UP':
+        sortedList = data.sort(
+          (a, b) =>
+            //@ts-ignore
+            b.financial?.last24h.change_percent -
+            //@ts-ignore
+            a.financial?.last24h.change_percent,
+        );
+        return setData(sortedList);
+      case 'DOWN':
+        sortedList = data.sort(
+          (a, b) =>
+            //@ts-ignore
+            a.financial?.last24h.change_percent -
+            //@ts-ignore
+            b.financial?.last24h.change_percent,
+        );
+        return setData(sortedList);
+      default:
+        return null;
+    }
   };
 
   function genFloorRand(min: number, max: number, decimalPlaces: number) {
@@ -255,7 +346,7 @@ export const useHome = () => {
     sortedData,
     page,
     isLoading,
-    ThemeService,
+    theme,
     filter,
     filtering,
     setData,
@@ -263,7 +354,8 @@ export const useHome = () => {
     setLoading,
     setFilter,
     setPage,
-    // dataFetch,
+    touch,
+    setTouch,
     fetchData,
     updater,
     navigation,
@@ -271,5 +363,15 @@ export const useHome = () => {
     filterByName,
     filterByPrice,
     filterByChanges,
+    searchData,
+    setSearchData,
+    AtoZ,
+    pSort,
+    setAtoZ,
+    setPSort,
+    mvSort,
+    chSort,
+    setMvSort,
+    setChSort,
   };
 };
